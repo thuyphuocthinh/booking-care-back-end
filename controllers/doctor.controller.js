@@ -1,6 +1,7 @@
 const {
   getTopDoctorsService,
   getAllDoctorsService,
+  saveInfoDoctorService,
 } = require("../services/doctorService");
 
 const getTopDoctorsHome = async (req, res) => {
@@ -30,7 +31,21 @@ const getAllDoctors = async (req, res) => {
   }
 };
 
+const saveInfoDoctor = async (req, res) => {
+  try {
+    const resp = await saveInfoDoctorService(req.body.doctorInfo);
+    return res.status(200).json(resp);
+  } catch (error) {
+    console.log(error);
+    return res.status(200).json({
+      errCode: -1,
+      message: "Error from server...",
+    });
+  }
+};
+
 module.exports = {
   getTopDoctorsHome,
   getAllDoctors,
+  saveInfoDoctor,
 };

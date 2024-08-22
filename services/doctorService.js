@@ -40,7 +40,7 @@ const getAllDoctorsService = async () => {
         where: { roleId: "R2" },
         order: [["createdAt", "DESC"]],
         attributes: {
-          exclude: ["password"],
+          exclude: ["password", "image"],
         },
         include: [
           {
@@ -65,7 +65,34 @@ const getAllDoctorsService = async () => {
   });
 };
 
+const saveInfoDoctorService = async (info) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!info.doctorId || !info.contentHTML || !info.contentMarkdown) {
+        await db.Markdown.create({
+          doctorId: info.doctorId,
+          contentMarkdown: info.contentMarkdown,
+          contentHTML: info.contentHTML,
+          description: info.description,
+        });
+        resolve({
+          errCode: 0,
+          msg: "Saved doctor info successfully",
+        });
+      } else {
+        reject({
+          errCode: -1,
+          msg: "All fields cannot be empty",
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getTopDoctorsService,
   getAllDoctorsService,
+  saveInfoDoctorService,
 };
