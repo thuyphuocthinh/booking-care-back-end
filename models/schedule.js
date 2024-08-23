@@ -9,6 +9,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Schedule.belongsTo(models.AllCode, {
+        foreignKey: "timeType",
+        targetKey: "keyMap",
+        as: "timeTypeData",
+      });
     }
   }
   Schedule.init(
@@ -16,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       doctorId: DataTypes.INTEGER,
       currentNumber: DataTypes.INTEGER,
       maxNumber: DataTypes.INTEGER,
-      date: DataTypes.DATE,
+      date: DataTypes.DATEONLY,
       timeType: DataTypes.STRING,
     },
     {
