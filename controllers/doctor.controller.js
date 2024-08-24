@@ -4,6 +4,8 @@ const {
   saveInfoDoctorService,
   getDoctorDetailService,
   updateDetailDoctorService,
+  getExtraInfoDoctorService,
+  getProfileDoctorService,
 } = require("../services/doctorService");
 
 const getTopDoctorsHome = async (req, res) => {
@@ -79,10 +81,52 @@ const updateDetailDoctor = async (req, res) => {
   }
 };
 
+const getExtraInfoDoctor = async (req, res) => {
+  try {
+    if (!req.params.doctorId) {
+      return res.status(400).json({
+        errCode: -1,
+        msg: "Doctor ID is required",
+      });
+    } else {
+      const resp = await getExtraInfoDoctorService(req.params.doctorId);
+      return res.status(200).json(resp);
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      errCode: -1,
+      msg: "Error server",
+    });
+  }
+};
+
+const getProfileDoctor = async (req, res) => {
+  try {
+    if (!req.params.doctorId) {
+      return res.status(400).json({
+        errCode: -1,
+        msg: "Doctor ID is required",
+      });
+    } else {
+      const resp = await getProfileDoctorService(req.params.doctorId);
+      return res.status(200).json(resp);
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      errCode: -1,
+      msg: "Error server",
+    });
+  }
+};
+
 module.exports = {
   getTopDoctorsHome,
   getAllDoctors,
   saveInfoDoctor,
   getDoctorDetail,
   updateDetailDoctor,
+  getExtraInfoDoctor,
+  getProfileDoctor,
 };

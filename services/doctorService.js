@@ -80,6 +80,15 @@ const saveInfoDoctorService = async (info) => {
           contentHTML: info.contentHTML,
           description: info.description,
         });
+        await db.Doctor_Info.create({
+          doctorId: info.doctorId,
+          priceId: info.priceId,
+          paymentId: info.paymentId,
+          provinceId: info.provinceId,
+          note: info.note,
+          nameClinic: info.nameClinic,
+          addressClinic: info.addressClinic,
+        });
         resolve({
           errCode: 0,
           msg: "Saved doctor info successfully",
@@ -115,12 +124,37 @@ const getDoctorDetailService = async (doctorId) => {
             as: "doctorData",
             attributes: ["contentHTML", "contentMarkdown", "description"],
           },
+          {
+            model: db.Doctor_Info,
+            as: "doctorInfoData",
+            attributes: {
+              exclude: ["id", "doctorId"],
+            },
+            include: [
+              {
+                model: db.AllCode,
+                as: "priceType",
+                attributes: ["valueEn", "valueVi"],
+              },
+              {
+                model: db.AllCode,
+                as: "paymentType",
+                attributes: ["valueEn", "valueVi"],
+              },
+              {
+                model: db.AllCode,
+                as: "provinceType",
+                attributes: ["valueEn", "valueVi"],
+              },
+            ],
+          },
         ],
       });
       if (!doctor) {
         resolve({
           errCode: -1,
           msg: "Doctor does not exist",
+          data: [],
         });
       } else {
         doctor.image = new Buffer(doctor.image, "base64").toString("binary");
@@ -142,9 +176,40 @@ const updateDetailDoctorService = async (doctorInfo) => {
         where: { doctorId: doctorInfo.doctorId },
       });
       if (doctorMarkdown) {
-        await db.Markdown.update(doctorInfo, {
+        const markdownUpdate = {
+          description: doctorInfo.description,
+          contentHTML: doctorInfo.contentHTML,
+          contentMarkdown: doctorInfo.contentMarkdown,
+        };
+        const doctorInfoUpdate = {
+          priceId: doctorInfo.priceId,
+          paymentId: doctorInfo.paymentId,
+          provinceId: doctorInfo.provinceId,
+          note: doctorInfo.note,
+          nameClinic: doctorInfo.nameClinic,
+          addressClinic: doctorInfo.addressClinic,
+        };
+        await db.Markdown.update(markdownUpdate, {
           where: { doctorId: doctorInfo.doctorId },
         });
+        const findDoctorId = await db.Doctor_Info.findOne({
+          where: { doctorId: doctorInfo.doctorId },
+        });
+        if (!findDoctorId) {
+          await db.Doctor_Info.create({
+            doctorId: doctorInfo.doctorId,
+            priceId: doctorInfo.priceId,
+            paymentId: doctorInfo.paymentId,
+            provinceId: doctorInfo.provinceId,
+            note: doctorInfo.note,
+            nameClinic: doctorInfo.nameClinic,
+            addressClinic: doctorInfo.addressClinic,
+          });
+        } else {
+          await db.Doctor_Info.update(doctorInfoUpdate, {
+            where: { doctorId: doctorInfo.doctorId },
+          });
+        }
         resolve({
           errCode: 0,
           msg: "Updated successfully",
@@ -161,10 +226,122 @@ const updateDetailDoctorService = async (doctorInfo) => {
   });
 };
 
+const getExtraInfoDoctorService = async (doctorId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const doctor = await db.Doctor_Info.findOne({
+        where: { doctorId: doctorId },
+        attributes: {
+          exclude: ["id", "doctorId"],
+        },
+        include: [
+          {
+            model: db.AllCode,
+            as: "priceType",
+            attributes: ["valueEn", "valueVi"],
+          },
+          {
+            model: db.AllCode,
+            as: "paymentType",
+            attributes: ["valueEn", "valueVi"],
+          },
+          {
+            model: db.AllCode,
+            as: "provinceType",
+            attributes: ["valueEn", "valueVi"],
+          },
+        ],
+      });
+      if (doctor) {
+        resolve({
+          errCode: 0,
+          data: doctor,
+        });
+      } else {
+        resolve({
+          errCode: 0,
+          msg: "Does not exist",
+          data: [],
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getProfileDoctorService = async (doctorId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const doctor = await db.User.findOne({
+        where: { roleId: "R2", id: doctorId },
+        attributes: {
+          exclude: ["password"],
+        },
+        include: [
+          {
+            model: db.AllCode,
+            as: "positionData",
+            attributes: ["valueEn", "valueVI"],
+          },
+          {
+            model: db.Markdown,
+            as: "doctorData",
+            attributes: ["contentHTML", "contentMarkdown", "description"],
+          },
+          {
+            model: db.Doctor_Info,
+            as: "doctorInfoData",
+            attributes: {
+              exclude: ["id", "doctorId"],
+            },
+            include: [
+              {
+                model: db.AllCode,
+                as: "priceType",
+                attributes: ["valueEn", "valueVi"],
+              },
+              {
+                model: db.AllCode,
+                as: "paymentType",
+                attributes: ["valueEn", "valueVi"],
+              },
+              {
+                model: db.AllCode,
+                as: "provinceType",
+                attributes: ["valueEn", "valueVi"],
+              },
+            ],
+          },
+        ],
+      });
+      if (doctor) {
+        if (doctor.image) {
+          doctor.image = new Buffer(doctor.image, "base64").toString("binary");
+        }
+        resolve({
+          errCode: 0,
+          data: doctor,
+        });
+      } else {
+        resolve({
+          errCode: -1,
+          data: {},
+          msg: "No data",
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getTopDoctorsService,
   getAllDoctorsService,
   saveInfoDoctorService,
   getDoctorDetailService,
   updateDetailDoctorService,
+  getExtraInfoDoctorService,
+  getProfileDoctorService,
 };
