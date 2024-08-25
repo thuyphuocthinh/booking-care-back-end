@@ -9,6 +9,14 @@ router.get("/get-detail-doctor/:doctorId", controller.getDoctorDetail);
 router.patch("/update-detail-doctor", controller.updateDetailDoctor);
 router.get("/get-extra-info-doctor/:doctorId", controller.getExtraInfoDoctor);
 router.get("/get-profile-doctor/:doctorId", controller.getProfileDoctor);
+router.get(
+  "/get-doctorIds-by-specialty/:specialtyId",
+  controller.getDoctorIdBySpecialty
+);
+router.get(
+  "/get-doctorIds-by-province/:provinceId/:specialtyId",
+  controller.getDoctorIdByProvince
+);
 
 module.exports = router;
 

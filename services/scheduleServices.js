@@ -66,6 +66,11 @@ const getScheduleDoctorByDateService = async (doctorId, date) => {
             as: "timeTypeData",
             attributes: ["valueEn", "valueVI"],
           },
+          {
+            model: db.User,
+            as: "doctorInfo",
+            attributes: ["firstName", "lastName"],
+          },
         ],
       });
       if (data) {

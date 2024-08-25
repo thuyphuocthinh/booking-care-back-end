@@ -182,6 +182,7 @@ const updateDetailDoctorService = async (doctorInfo) => {
           contentMarkdown: doctorInfo.contentMarkdown,
         };
         const doctorInfoUpdate = {
+          specialtyId: doctorInfo.specialtyId,
           priceId: doctorInfo.priceId,
           paymentId: doctorInfo.paymentId,
           provinceId: doctorInfo.provinceId,
@@ -336,7 +337,58 @@ const getProfileDoctorService = async (doctorId) => {
   });
 };
 
+const getDoctorIdBySpecialtyService = async (specialtyId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let data = await db.Doctor_Info.findAll({
+        where: { specialtyId: specialtyId },
+        attributes: ["doctorId"],
+      });
+      if (data) {
+        data = data.map((item) => item.doctorId);
+        resolve({
+          errCode: 0,
+          data: data,
+        });
+      } else {
+        resolve({
+          errCode: 0,
+          data: data,
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getDoctorIdByProvinceService = async (provinceId, specialtyId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let data = await db.Doctor_Info.findAll({
+        where: { provinceId: provinceId, specialtyId: specialtyId },
+        attributes: ["doctorId"],
+      });
+      if (data) {
+        data = data.map((item) => item.doctorId);
+        resolve({
+          errCode: 0,
+          data: data,
+        });
+      } else {
+        resolve({
+          errCode: 0,
+          data: data,
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
+  getDoctorIdByProvinceService,
   getTopDoctorsService,
   getAllDoctorsService,
   saveInfoDoctorService,
@@ -344,4 +396,5 @@ module.exports = {
   updateDetailDoctorService,
   getExtraInfoDoctorService,
   getProfileDoctorService,
+  getDoctorIdBySpecialtyService,
 };

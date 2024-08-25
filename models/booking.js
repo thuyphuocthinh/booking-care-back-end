@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       patientId: DataTypes.INTEGER,
       date: DataTypes.DATEONLY,
       timeType: DataTypes.STRING,
+      token: DataTypes.STRING,
     },
     {
       sequelize,
