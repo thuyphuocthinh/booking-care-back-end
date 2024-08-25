@@ -1,3 +1,5 @@
+const moment = require("moment/moment");
+const { STATUS_CONFIRMED } = require("../config/constants");
 const db = require("../models");
 
 const getTopDoctorsService = async (limit) => {
@@ -81,6 +83,8 @@ const saveInfoDoctorService = async (info) => {
           description: info.description,
         });
         await db.Doctor_Info.create({
+          specialtyId: info.specialtyId,
+          clinicId: info.clinicId,
           doctorId: info.doctorId,
           priceId: info.priceId,
           paymentId: info.paymentId,
@@ -146,6 +150,16 @@ const getDoctorDetailService = async (doctorId) => {
                 as: "provinceType",
                 attributes: ["valueEn", "valueVi"],
               },
+              {
+                model: db.Specialty,
+                as: "specialtyData",
+                attributes: ["id", "name"],
+              },
+              {
+                model: db.Clinic,
+                as: "clinicData",
+                attributes: ["id", "name"],
+              },
             ],
           },
         ],
@@ -183,6 +197,7 @@ const updateDetailDoctorService = async (doctorInfo) => {
         };
         const doctorInfoUpdate = {
           specialtyId: doctorInfo.specialtyId,
+          clinicId: doctorInfo.clinicId,
           priceId: doctorInfo.priceId,
           paymentId: doctorInfo.paymentId,
           provinceId: doctorInfo.provinceId,
@@ -387,6 +402,76 @@ const getDoctorIdByProvinceService = async (provinceId, specialtyId) => {
   });
 };
 
+const getDoctorIdByClinicService = async (clinicId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let data = await db.Doctor_Info.findAll({
+        where: { clinicId: clinicId },
+        attributes: ["doctorId"],
+      });
+      if (data) {
+        data = data.map((item) => item.doctorId);
+        resolve({
+          errCode: 0,
+          data: data,
+        });
+      } else {
+        resolve({
+          errCode: 0,
+          data: data,
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const getListPatientsService = async (doctorId, date) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const dateTimeStamp = moment(date).format("YYYY-MM-DD");
+      let data = await db.Booking.findAll({
+        where: {
+          doctorId: doctorId,
+          date: dateTimeStamp,
+          statusId: STATUS_CONFIRMED,
+        },
+        include: [
+          {
+            model: db.User,
+            as: "patientData",
+            attributes: ["firstName", "gender", "email", "address"],
+            include: {
+              model: db.AllCode,
+              as: "genderData",
+              attributes: ["valueVi", "valueEn"],
+            },
+          },
+          {
+            model: db.AllCode,
+            as: "timeTypeBooking",
+            attributes: ["valueEn", "valueVi"],
+          },
+        ],
+      });
+      if (data && data.length > 0) {
+        resolve({
+          errCode: 0,
+          data: data,
+        });
+      } else {
+        resolve({
+          errCode: 0,
+          data: data,
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getDoctorIdByProvinceService,
   getTopDoctorsService,
@@ -396,5 +481,7 @@ module.exports = {
   updateDetailDoctorService,
   getExtraInfoDoctorService,
   getProfileDoctorService,
+  getDoctorIdByClinicService,
   getDoctorIdBySpecialtyService,
+  getListPatientsService,
 };

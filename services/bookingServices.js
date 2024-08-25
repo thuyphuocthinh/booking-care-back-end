@@ -23,15 +23,17 @@ const saveBookingInfoService = async (info) => {
         const [user, created] = await db.User.findOrCreate({
           where: { email: info.email },
           defaults: {
+            firstName: info.fullName,
             email: info.email,
             roleId: PATIENT_CODE,
+            gender: info.gender,
+            address: info.address,
           },
         });
         if (user) {
           const token = uuidv4();
           // upsert user (patient)
-
-          await db.Booking.findOrCreate({
+          const [booking, created] = await db.Booking.findOrCreate({
             where: {
               patientId: user.id,
               doctorId: info.doctorId,
@@ -47,7 +49,7 @@ const saveBookingInfoService = async (info) => {
               token: token,
             },
           });
-
+          console.log("finish booking create");
           // send mail
           const url = buildUrl(token, info.doctorId);
           const html = buildHtml(info.language, info, url);

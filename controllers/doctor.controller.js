@@ -8,6 +8,8 @@ const {
   getProfileDoctorService,
   getDoctorIdBySpecialtyService,
   getDoctorIdByProvinceService,
+  getDoctorIdByClinicService,
+  getListPatientsService,
 } = require("../services/doctorService");
 
 const getTopDoctorsHome = async (req, res) => {
@@ -158,6 +160,41 @@ const getDoctorIdByProvince = async (req, res) => {
   }
 };
 
+const getDoctorIdByClinic = async (req, res) => {
+  try {
+    if (req.params.clinicId) {
+      const resp = await getDoctorIdByClinicService(
+        parseInt(req.params.clinicId)
+      );
+      return res.status(200).json(resp);
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      errCode: -1,
+      errMsg: "Error server...",
+    });
+  }
+};
+
+const getListPatients = async (req, res) => {
+  try {
+    if (req.params.doctorId && req.params.date) {
+      const resp = await getListPatientsService(
+        parseInt(req.params.doctorId),
+        Number(req.params.date)
+      );
+      return res.status(200).json(resp);
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      errCode: -1,
+      errMsg: "Error server...",
+    });
+  }
+};
+
 module.exports = {
   getDoctorIdByProvince,
   getTopDoctorsHome,
@@ -166,6 +203,8 @@ module.exports = {
   getDoctorDetail,
   updateDetailDoctor,
   getExtraInfoDoctor,
+  getDoctorIdByClinic,
   getProfileDoctor,
   getDoctorIdBySpecialty,
+  getListPatients,
 };

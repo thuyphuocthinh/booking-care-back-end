@@ -18,6 +18,7 @@ const handleLogin = async (username, password) => {
             roleId: user.roleId,
             firstName: user.firstName,
             lastName: user.lastName,
+            id: user.id,
           });
         } else {
           resolve({

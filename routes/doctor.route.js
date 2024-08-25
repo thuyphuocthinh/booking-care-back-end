@@ -17,6 +17,11 @@ router.get(
   "/get-doctorIds-by-province/:provinceId/:specialtyId",
   controller.getDoctorIdByProvince
 );
+router.get(
+  "/get-doctorIds-by-clinic/:clinicId",
+  controller.getDoctorIdByClinic
+);
+router.get("/get-list-patients/:doctorId/:date", controller.getListPatients);
 
 module.exports = router;
 
