@@ -10,6 +10,7 @@ const {
   getDoctorIdByProvinceService,
   getDoctorIdByClinicService,
   getListPatientsService,
+  sendRemedyService,
 } = require("../services/doctorService");
 
 const getTopDoctorsHome = async (req, res) => {
@@ -195,6 +196,19 @@ const getListPatients = async (req, res) => {
   }
 };
 
+const sendRemedy = async (req, res) => {
+  try {
+    const resp = await sendRemedyService(req.body);
+    return res.status(200).json(resp);
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      errCode: -1,
+      errMsg: "Error server...",
+    });
+  }
+};
+
 module.exports = {
   getDoctorIdByProvince,
   getTopDoctorsHome,
@@ -207,4 +221,5 @@ module.exports = {
   getProfileDoctor,
   getDoctorIdBySpecialty,
   getListPatients,
+  sendRemedy,
 };

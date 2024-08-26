@@ -22,6 +22,7 @@ router.get(
   controller.getDoctorIdByClinic
 );
 router.get("/get-list-patients/:doctorId/:date", controller.getListPatients);
+router.patch("/send-remedy", controller.sendRemedy);
 
 module.exports = router;
 

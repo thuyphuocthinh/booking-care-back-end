@@ -1,6 +1,9 @@
 const moment = require("moment/moment");
-const { STATUS_CONFIRMED } = require("../config/constants");
+const { STATUS_CONFIRMED, STATUS_DONE } = require("../config/constants");
 const db = require("../models");
+const { buildHtmlForAttachment } = require("../helpers/buildHtml");
+const { buildSubjectForAttachment } = require("../helpers/buildSubject");
+const { sendAttachment } = require("../helpers/sendMail");
 
 const getTopDoctorsService = async (limit) => {
   return new Promise(async (resolve, reject) => {
@@ -472,6 +475,47 @@ const getListPatientsService = async (doctorId, date) => {
   });
 };
 
+const sendRemedyService = async (info) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const record = await db.Booking.findOne({
+        where: {
+          patientId: info.patientId,
+          doctorId: info.doctorId,
+          statusId: STATUS_CONFIRMED,
+          timeType: info.timeType,
+        },
+      });
+      if (record) {
+        await db.Booking.update(
+          {
+            statusId: STATUS_DONE,
+          },
+          {
+            where: {
+              patientId: info.patientId,
+              doctorId: info.doctorId,
+              statusId: STATUS_CONFIRMED,
+              timeType: info.timeType,
+            },
+          }
+        );
+
+        const html = buildHtmlForAttachment(info.language);
+        const subject = buildSubjectForAttachment(info.language);
+        sendAttachment(info.email, subject, html, info.image, resolve);
+      } else {
+        resolve({
+          errCode: -1,
+          msg: "Booking does not exist",
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getDoctorIdByProvinceService,
   getTopDoctorsService,
@@ -484,4 +528,5 @@ module.exports = {
   getDoctorIdByClinicService,
   getDoctorIdBySpecialtyService,
   getListPatientsService,
+  sendRemedyService,
 };

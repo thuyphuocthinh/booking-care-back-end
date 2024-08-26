@@ -44,3 +44,25 @@ module.exports.buildHtml = (language, data, url) => {
   }
   return html;
 };
+
+module.exports.buildHtmlForAttachment = (language) => {
+  let html = "";
+  if (language === languages.VI) {
+    html = `
+      <div>
+        <p>Bạn nhận được email này vì đã sử dụng dịch vụ của BookingCare</p>
+        <p>THông tin đơn thuốc / hóa đơn được gửi trong file đính kèm</p>
+        <p>Xin chân thành cảm ơn</p>
+      </div>
+      `;
+  } else {
+    html = `
+      <div>
+        <p>Thanks for using BookingCare's services,</p>
+        <p>Your remedy / bill was attached in the file below</p>
+        <p>Best regards.</p>
+      </div>
+      `;
+  }
+  return html;
+};

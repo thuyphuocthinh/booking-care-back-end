@@ -9,3 +9,13 @@ module.exports.buildSubject = (language) => {
   }
   return subject;
 };
+
+module.exports.buildSubjectForAttachment = (language) => {
+  let subject;
+  if (language === languages.VI) {
+    subject = "THÔNG TIN KẾT QUẢ KHÁM BỆNH";
+  } else {
+    subject = "TREATMENT'S RESULT FROM BOOKINGCARE";
+  }
+  return subject;
+};
